@@ -1,8 +1,15 @@
 #!/bin/bash
 # 🚀 Sincroniza o vault do Obsidian com GitHub (usando caminho relativo)
 
-VAULT_PATH="../fillipe-vault-starter"
-cd "$VAULT_PATH" || { echo "❌ Caminho inválido: $VAULT_PATH"; exit 1; }
+# Carrega variáveis do .env
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
+if [ -z "$VAULT_PATH" ]; then
+  echo "❌ VAULT_PATH não definido. Verifique seu .env."
+  exit 1
+fi
 
 # Verifica se há alterações
 if git diff --quiet && git diff --cached --quiet; then
