@@ -1,0 +1,23 @@
+# Ignore arquivos de ambiente
+.env
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+
+# Obsidian
+.obsidian/
+
+# Backups e temporários
+backups/
+*.tmp
