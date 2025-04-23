@@ -1,6 +1,5 @@
 # Ignore arquivos de ambiente
 .env
-.env.example
 
 # Logs
 *.log
