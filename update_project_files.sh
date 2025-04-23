@@ -16,9 +16,15 @@ DEV_LOG_DIR="$VAULT_PATH/Logs/dev-log"
 
 for file in "$PROJECTS_DIR"/*.md; do
   PROJECT_NAME=$(basename "$file" .md)
+  PROJECT_LOG_DIR="$DEV_LOG_DIR/$PROJECT_NAME"
 
-  # Pega os dois últimos logs
-  LOGS=($(ls "$DEV_LOG_DIR" | grep "_$PROJECT_NAME.md" | sort -r))
+  if [ ! -d "$PROJECT_LOG_DIR" ]; then
+    echo "⚠️ Nenhum diretório de log encontrado para $PROJECT_NAME"
+    continue
+  fi
+
+  # Pega até dois últimos logs
+  LOGS=($(ls "$PROJECT_LOG_DIR" | grep "_$PROJECT_NAME.md" | sort -r | head -n 2))
   LAST_LOG=${LOGS[0]}
   SECOND_LOG=${LOGS[1]}
 
@@ -28,7 +34,7 @@ for file in "$PROJECTS_DIR"/*.md; do
   fi
 
   # Monta nova linha de última alteração
-  ULTIMA_ALTERACAO_LINE="- Última alteração: [[Logs/dev-log/${LAST_LOG%.md}]]"
+  ULTIMA_ALTERACAO_LINE="- Última alteração: [[Logs/dev-log/$PROJECT_NAME/${LAST_LOG%.md}]]"
 
   # Atualiza a linha de "Última alteração" na seção de status
   awk -v nova="$ULTIMA_ALTERACAO_LINE" '
@@ -48,13 +54,13 @@ for file in "$PROJECTS_DIR"/*.md; do
     }' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
 
   # Atualiza a seção "Dev Logs Recentes"
-  awk -v l1="[[Logs/dev-log/${LAST_LOG%.md}]]" -v l2="[[Logs/dev-log/${SECOND_LOG%.md}]]" '
+  awk -v l1="[[Logs/dev-log/$PROJECT_NAME/${LAST_LOG%.md}]]" -v l2="[[Logs/dev-log/$PROJECT_NAME/${SECOND_LOG%.md}]]" '
     BEGIN { section_found=0 }
     {
       if ($0 ~ /^## 🔄 Dev Logs Recentes/) {
         print
         print "- " l1
-        if (l2 != "[[Logs/dev-log/]]") print "- " l2
+        if (l2 != "" && l2 != "[[Logs/dev-log/$PROJECT_NAME/]]") print "- " l2
         section_found=1
         # Skip old entries
         getline; while ($0 ~ /^- \[\[Logs\/dev-log\/.*\]\]/) getline;
